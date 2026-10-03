@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Match } from "@/lib/matches";
 import { normalizeMatch, uniqueCharacterIds } from "@/lib/matches";
-import { profileMaps, searchSuggestions, topCombos, topTenPlayers } from "@/lib/stats";
+import {
+  profileMaps,
+  searchSuggestions,
+  todayMatchCount,
+  topCombos,
+  topTenPlayers,
+} from "@/lib/stats";
 
 function match(partial: Partial<Match> & Pick<Match, "id" | "p1Name" | "p2Name" | "winner">): Match {
   return {
@@ -49,6 +55,20 @@ describe("uniqueCharacterIds", () => {
   it("collapses solo tags", () => {
     expect(uniqueCharacterIds([64, 64])).toEqual([64]);
     expect(uniqueCharacterIds([0, 64])).toEqual([0, 64]);
+  });
+});
+
+describe("todayMatchCount", () => {
+  it("counts matches from KST midnight through now, excluding earlier and future matches", () => {
+    const now = Date.parse("2026-10-03T02:00:00.000Z");
+    const matches = [
+      match({ id: "before-midnight", p1Name: "A", p2Name: "B", winner: "A", playedAt: "2026-10-02T14:59:59.999Z" }),
+      match({ id: "at-midnight", p1Name: "A", p2Name: "B", winner: "A", playedAt: "2026-10-02T15:00:00.000Z" }),
+      match({ id: "at-now", p1Name: "A", p2Name: "B", winner: "A", playedAt: "2026-10-03T02:00:00.000Z" }),
+      match({ id: "future", p1Name: "A", p2Name: "B", winner: "A", playedAt: "2026-10-03T02:00:00.001Z" }),
+    ];
+
+    expect(todayMatchCount(matches, now)).toBe(2);
   });
 });
 
