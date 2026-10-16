@@ -15,6 +15,8 @@ function match(partial: Partial<Match> & Pick<Match, "id" | "p1Name" | "p2Name" 
     p2Score: 1,
     p1Characters: [0, 64],
     p2Characters: [20, 30],
+    p1CharacterRanks: [null, null],
+    p2CharacterRanks: [null, null],
     mapId: 0,
     playedAt: "2026-09-01T00:00:00.000Z",
     startAt: "2026-09-01T00:00:00.000Z",
@@ -38,6 +40,10 @@ describe("normalizeMatch", () => {
         p1_sub_character_id: 0,
         p2_main_character_id: 20,
         p2_sub_character_id: 30,
+        p1_main_character_rank: 0,
+        p1_sub_character_rank: 10,
+        p2_main_character_rank: 38,
+        p2_sub_character_rank: 42,
         map_id: 0,
         start_time: "2026-09-01T00:00:00.000Z",
         end_time: "2026-09-01T00:05:00.000Z",
@@ -48,6 +54,34 @@ describe("normalizeMatch", () => {
     expect(result?.p1Name).toBe("Alice");
     expect(result?.mapId).toBe(0);
     expect(result?.p1Characters).toEqual([0, 0]);
+    expect(result?.p1CharacterRanks).toEqual([0, 10]);
+    expect(result?.p2CharacterRanks).toEqual([38, 42]);
+  });
+
+  it("allows missing legacy ranks", () => {
+    const legacyMatch = normalizeMatch(
+      { id: 2, p1_name: "Alice", p2_name: "Bob", winner: "Bob" },
+      0,
+    );
+    expect(legacyMatch?.p1CharacterRanks).toEqual([null, null]);
+    expect(legacyMatch?.p2CharacterRanks).toEqual([null, null]);
+  });
+
+  it("rejects rank codes outside the integer range 0-42", () => {
+    for (const rankCode of [-1, 43, 1.5]) {
+      expect(() =>
+        normalizeMatch(
+          {
+            id: 3,
+            p1_name: "Alice",
+            p2_name: "Bob",
+            winner: "Bob",
+            p1_main_character_rank: rankCode,
+          },
+          0,
+        ),
+      ).toThrow("계급 코드가 올바르지 않습니다");
+    }
   });
 });
 
