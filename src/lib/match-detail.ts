@@ -3,6 +3,8 @@ export const MATCH_FIGHTER_COUNT_FIELDS = [
   "thrown_count",
   "dodged_throw_count",
   "throw_dodged_count",
+  "team_throw_attempts",
+  "team_throw_success_count",
   "low_blow_count",
   "low_blowed_count",
   "dodged_low_blow_count",
@@ -17,8 +19,8 @@ export const MATCH_FIGHTER_COUNT_FIELDS = [
 ] as const;
 
 export const MATCH_FIGHTER_RATE_FIELDS = [
-  "throw_success_rate",
   "throw_defense_rate",
+  "team_throw_success_rate",
   "low_blow_success_rate",
   "low_blow_defense_rate",
 ] as const;

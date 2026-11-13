@@ -51,19 +51,17 @@ export function MatchFighterStats({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <MatchStatGroup
-          title="잡기"
+          title="잡기 시도"
+          metrics={[{ label: "내가 시도한 잡기", count: fighter.throw_count }]}
+        />
+
+        <MatchStatGroup
+          title="잡기 풀기"
           metrics={[
-            { label: "잡기 성공", count: fighter.throw_count },
-            {
-              label: "잡기 시도 · 성공률",
-              count: sumNullableCounts(fighter.throw_count, fighter.throw_dodged_count),
-              rate: fighter.throw_success_rate,
-            },
             { label: "내가 푼 잡기", count: fighter.dodged_throw_count },
-            { label: "내가 잡힘", count: fighter.thrown_count },
             {
-              label: "잡기 방어 시도 · 성공률",
-              count: sumNullableCounts(fighter.dodged_throw_count, fighter.thrown_count),
+              label: "잡기 당한 시도 · 방어율",
+              count: fighter.thrown_count,
               rate: fighter.throw_defense_rate,
             },
           ]}

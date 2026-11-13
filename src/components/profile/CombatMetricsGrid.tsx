@@ -3,22 +3,32 @@ import { sumNullableCounts } from "@/lib/combat-statistics";
 import type { CombatMetrics } from "@/lib/player-combat-statistics";
 
 export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
+  // 팀 잡기 성공은 편(팀) 단위 값이라 캐릭터별(=null)에서는 잡기 성공 카드를 감춘다.
+  const hasTeamThrow = stats.team_throw_attempts !== null;
+
   return (
     <div className="grid gap-2 sm:grid-cols-2">
+      {hasTeamThrow ? (
+        <StatMetricGroup
+          title="잡기 성공"
+          metrics={[
+            { label: "성공 횟수", count: stats.team_throw_success_count },
+            {
+              label: "시도 횟수",
+              count: stats.team_throw_attempts,
+              rate: stats.team_throw_success_rate,
+            },
+          ]}
+        />
+      ) : null}
+
       <StatMetricGroup
-        title="잡기"
+        title="잡기 풀기"
         metrics={[
-          { label: "잡기 성공", count: stats.throw_count },
+          { label: "푼 횟수", count: stats.dodged_throw_count },
           {
-            label: "잡기 시도 · 성공률",
-            count: sumNullableCounts(stats.throw_count, stats.throw_dodged_count),
-            rate: stats.throw_success_rate,
-          },
-          { label: "내가 푼 잡기", count: stats.dodged_throw_count },
-          { label: "내가 잡힘", count: stats.thrown_count },
-          {
-            label: "잡기 방어 시도 · 성공률",
-            count: sumNullableCounts(stats.dodged_throw_count, stats.thrown_count),
+            label: "잡힌 횟수",
+            count: stats.thrown_count,
             rate: stats.throw_defense_rate,
           },
         ]}

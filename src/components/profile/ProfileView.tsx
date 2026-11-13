@@ -515,10 +515,36 @@ function ProfileContent({ profile }: { profile: string }) {
                               </h4>
                               <div className="grid grid-cols-2 gap-2">
                               {[
-                                { label: "잡기 시도", count: rival.stats.throw_attempts, rate: rival.stats.throw_success_rate },
-                                { label: "잡기 방어", count: rival.stats.throw_defense_attempts, rate: rival.stats.throw_defense_rate },
-                                { label: "하단 시도", count: rival.stats.low_blow_attempts, rate: rival.stats.low_blow_success_rate },
-                                { label: "하단 방어", count: rival.stats.low_blow_defense_attempts, rate: rival.stats.low_blow_defense_rate },
+                                {
+                                  label: "잡기 성공",
+                                  values: [
+                                    { label: "성공 횟수", value: rival.stats.team_throw_success_count, unit: "회" },
+                                    { label: "시도 횟수", value: rival.stats.team_throw_attempts, unit: "회" },
+                                    { label: "성공률", value: rival.stats.team_throw_success_rate, unit: "%" },
+                                  ],
+                                },
+                                {
+                                  label: "잡기 풀기",
+                                  values: [
+                                    { label: "푼 횟수", value: rival.stats.dodged_throw_count, unit: "회" },
+                                    { label: "잡힌 횟수", value: rival.stats.throw_defense_attempts, unit: "회" },
+                                    { label: "성공률", value: rival.stats.throw_defense_rate, unit: "%" },
+                                  ],
+                                },
+                                {
+                                  label: "하단 시도",
+                                  values: [
+                                    { label: "시도 횟수", value: rival.stats.low_blow_attempts, unit: "회" },
+                                    { label: "성공률", value: rival.stats.low_blow_success_rate, unit: "%" },
+                                  ],
+                                },
+                                {
+                                  label: "하단 방어",
+                                  values: [
+                                    { label: "시도 횟수", value: rival.stats.low_blow_defense_attempts, unit: "회" },
+                                    { label: "성공률", value: rival.stats.low_blow_defense_rate, unit: "%" },
+                                  ],
+                                },
                               ].map((metric) => (
                                 <div
                                   className="rounded-lg border border-slate-700/80 bg-slate-800/65 px-2.5 py-2"
@@ -527,19 +553,27 @@ function ProfileContent({ profile }: { profile: string }) {
                                   <h5 className="text-xs font-semibold text-slate-200">
                                     {metric.label}
                                   </h5>
-                                  <div className="mt-2 grid grid-cols-2 gap-2 border-t border-slate-700/70 pt-2">
-                                    <div className="min-w-0">
-                                      <p className="text-[10px] text-slate-400">시도 횟수</p>
-                                      <p className="mt-0.5 text-sm font-bold text-white">
-                                        {metric.count === null ? "—" : `${metric.count}회`}
-                                      </p>
-                                    </div>
-                                    <div className="min-w-0">
-                                      <p className="text-[10px] text-slate-400">성공률</p>
-                                      <p className="mt-0.5 text-sm font-bold text-cyan-300">
-                                        {metric.rate === null ? "—" : `${metric.rate.toFixed(1)}%`}
-                                      </p>
-                                    </div>
+                                  <div
+                                    className={`mt-2 grid gap-2 border-t border-slate-700/70 pt-2 ${
+                                      metric.values.length === 3 ? "grid-cols-3" : "grid-cols-2"
+                                    }`}
+                                  >
+                                    {metric.values.map((item) => (
+                                      <div className="min-w-0" key={item.label}>
+                                        <p className="text-[10px] text-slate-400">{item.label}</p>
+                                        <p
+                                          className={`mt-0.5 text-sm font-bold ${
+                                            item.unit === "%" ? "text-cyan-300" : "text-white"
+                                          }`}
+                                        >
+                                          {item.value === null
+                                            ? "—"
+                                            : item.unit === "%"
+                                              ? `${item.value.toFixed(1)}%`
+                                              : `${item.value}회`}
+                                        </p>
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
                               ))}

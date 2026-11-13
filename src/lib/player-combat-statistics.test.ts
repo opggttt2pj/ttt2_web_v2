@@ -7,6 +7,8 @@ function metrics() {
     thrown_count: 1,
     dodged_throw_count: 1,
     throw_dodged_count: 1,
+    team_throw_attempts: 12,
+    team_throw_success_count: 7,
     low_blow_count: 1,
     low_blowed_count: 0,
     dodged_low_blow_count: 1,
@@ -18,7 +20,7 @@ function metrics() {
     combo_hit_plain: 2,
     combo_hit_wall: 1,
     combo_hit_gimmick: 1,
-    throw_success_rate: 66.7,
+    team_throw_success_rate: 58.3,
     throw_defense_rate: 50,
     low_blow_success_rate: 100,
     low_blow_defense_rate: 100,
@@ -56,7 +58,7 @@ describe("parsePlayerCombatStatistics", () => {
       rate: 75,
       stats_matches: 2,
     });
-    expect(result.overall.throw_success_rate).toBe(66.7);
+    expect(result.overall.team_throw_success_rate).toBe(58.3);
     expect(result.characters[0]).toMatchObject({
       character_id: 4,
       matches: 2,

@@ -6,8 +6,10 @@ import {
 
 function rivalStats() {
   return {
-    throw_attempts: 12,
-    throw_success_rate: 58.3,
+    team_throw_attempts: 12,
+    team_throw_success_count: 7,
+    team_throw_success_rate: 58.3,
+    dodged_throw_count: 6,
     throw_defense_attempts: 9,
     throw_defense_rate: 66.7,
     low_blow_attempts: 7,
@@ -35,8 +37,10 @@ function payload(): {
     wins: number;
     lastPlayed: string | null;
     stats: {
-      throw_attempts: number | null;
-      throw_success_rate: number | null;
+      team_throw_attempts: number | null;
+      team_throw_success_count: number | null;
+      team_throw_success_rate: number | null;
+      dodged_throw_count: number | null;
       throw_defense_attempts: number | null;
       throw_defense_rate: number | null;
       low_blow_attempts: number | null;
@@ -51,8 +55,10 @@ function payload(): {
     wins: number;
     rate: number;
     stats: {
-      throw_attempts: number | null;
-      throw_success_rate: number | null;
+      team_throw_attempts: number | null;
+      team_throw_success_count: number | null;
+      team_throw_success_rate: number | null;
+      dodged_throw_count: number | null;
       throw_defense_attempts: number | null;
       throw_defense_rate: number | null;
       low_blow_attempts: number | null;
@@ -151,7 +157,7 @@ describe("parseProfileStatistics", () => {
           name: "Bob",
           games: 8,
           wins: 5,
-          stats: { throw_attempts: 12, throw_success_rate: 58.3, low_blow_defense_rate: 80 },
+          stats: { team_throw_attempts: 12, team_throw_success_count: 7, team_throw_success_rate: 58.3, dodged_throw_count: 6, low_blow_defense_rate: 80 },
         },
       ],
       trend: {
@@ -241,8 +247,8 @@ describe("parseProfileStatistics", () => {
     });
 
     const badRate = payload();
-    badRate.rivals[0].stats!.throw_success_rate = 120;
-    expect(() => parseProfileStatistics(badRate)).toThrow(/최근 상대 전투 스탯 잡기 성공률/);
+    badRate.rivals[0].stats!.team_throw_success_rate = 120;
+    expect(() => parseProfileStatistics(badRate)).toThrow(/최근 상대 전투 스탯 팀 잡기 성공률/);
   });
 
   it("rejects incomplete or inconsistent trend data", () => {

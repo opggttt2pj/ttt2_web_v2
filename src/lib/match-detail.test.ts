@@ -13,6 +13,8 @@ function fighter(p1p2: 1 | 2, mainSub: 1 | 2) {
     thrown_count: 0,
     dodged_throw_count: 0,
     throw_dodged_count: 0,
+    team_throw_attempts: 0,
+    team_throw_success_count: 0,
     low_blow_count: 0,
     low_blowed_count: 0,
     dodged_low_blow_count: 0,
@@ -24,7 +26,7 @@ function fighter(p1p2: 1 | 2, mainSub: 1 | 2) {
     combo_hit_plain: 0,
     combo_hit_wall: 0,
     combo_hit_gimmick: 0,
-    throw_success_rate: null,
+    team_throw_success_rate: null,
     throw_defense_rate: null,
     low_blow_success_rate: null,
     low_blow_defense_rate: null,
@@ -58,7 +60,7 @@ describe("parseMatchDetail", () => {
       main_sub: 1,
       is_win: true,
       throw_count: 0,
-      throw_success_rate: null,
+      team_throw_success_rate: null,
     });
   });
 

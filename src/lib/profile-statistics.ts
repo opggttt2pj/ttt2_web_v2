@@ -1,6 +1,8 @@
 export type RivalCombatStats = {
-  throw_attempts: number | null;
-  throw_success_rate: number | null;
+  team_throw_attempts: number | null;
+  team_throw_success_count: number | null;
+  team_throw_success_rate: number | null;
+  dodged_throw_count: number | null;
   throw_defense_attempts: number | null;
   throw_defense_rate: number | null;
   low_blow_attempts: number | null;
@@ -116,10 +118,21 @@ function parseRivalCombatStats(
   if (value === null || value === undefined) return null;
   const item = record(value, context);
   return {
-    throw_attempts: nullableCount(item.throw_attempts, `${context} 잡기 시도`),
-    throw_success_rate: nullablePercentage(
-      item.throw_success_rate,
-      `${context} 잡기 성공률`,
+    team_throw_attempts: nullableCount(
+      item.team_throw_attempts,
+      `${context} 팀 잡기 시도`,
+    ),
+    team_throw_success_count: nullableCount(
+      item.team_throw_success_count,
+      `${context} 팀 잡기 성공`,
+    ),
+    team_throw_success_rate: nullablePercentage(
+      item.team_throw_success_rate,
+      `${context} 팀 잡기 성공률`,
+    ),
+    dodged_throw_count: nullableCount(
+      item.dodged_throw_count,
+      `${context} 내가 푼 잡기`,
     ),
     throw_defense_attempts: nullableCount(
       item.throw_defense_attempts,
