@@ -12,8 +12,10 @@ function rivalStats() {
     dodged_throw_count: 6,
     throw_defense_attempts: 9,
     throw_defense_rate: 66.7,
+    low_blow_count: 3,
     low_blow_attempts: 7,
     low_blow_success_rate: 42.9,
+    dodged_low_blow_count: 4,
     low_blow_defense_attempts: 5,
     low_blow_defense_rate: 80,
   };

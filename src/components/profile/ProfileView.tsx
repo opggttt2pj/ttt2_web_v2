@@ -532,17 +532,19 @@ function ProfileContent({ profile }: { profile: string }) {
                                   ],
                                 },
                                 {
-                                  label: "하단 시도",
+                                  label: "하단 성공",
                                   values: [
+                                    { label: "성공 횟수", value: rival.stats.low_blow_count, unit: "회" },
                                     { label: "시도 횟수", value: rival.stats.low_blow_attempts, unit: "회" },
                                     { label: "성공률", value: rival.stats.low_blow_success_rate, unit: "%" },
                                   ],
                                 },
                                 {
-                                  label: "하단 방어",
+                                  label: "하단 가드",
                                   values: [
-                                    { label: "시도 횟수", value: rival.stats.low_blow_defense_attempts, unit: "회" },
-                                    { label: "성공률", value: rival.stats.low_blow_defense_rate, unit: "%" },
+                                    { label: "가드 횟수", value: rival.stats.dodged_low_blow_count, unit: "회" },
+                                    { label: "적 하단 공격 횟수", value: rival.stats.low_blow_defense_attempts, unit: "회" },
+                                    { label: "가드율", value: rival.stats.low_blow_defense_rate, unit: "%" },
                                   ],
                                 },
                               ].map((metric) => (
@@ -560,9 +562,19 @@ function ProfileContent({ profile }: { profile: string }) {
                                   >
                                     {metric.values.map((item) => (
                                       <div className="min-w-0" key={item.label}>
-                                        <p className="text-[10px] text-slate-400">{item.label}</p>
+                                        <p className="text-[10px] leading-tight text-slate-400">{item.label}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div
+                                    className={`mt-1 grid gap-2 ${
+                                      metric.values.length === 3 ? "grid-cols-3" : "grid-cols-2"
+                                    }`}
+                                  >
+                                    {metric.values.map((item) => (
+                                      <div className="min-w-0" key={item.label}>
                                         <p
-                                          className={`mt-0.5 text-sm font-bold ${
+                                          className={`text-sm font-bold tabular-nums ${
                                             item.unit === "%" ? "text-cyan-300" : "text-white"
                                           }`}
                                         >

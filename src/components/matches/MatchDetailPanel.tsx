@@ -1,7 +1,7 @@
 "use client";
 
 import { MatchFighterStats } from "@/components/matches/MatchFighterStats";
-import { MatchStatGroup } from "@/components/matches/MatchStatGroup";
+import { StatValueGroup } from "@/components/statistics/StatMetricGroup";
 import { formatDate } from "@/lib/format";
 import type { MatchDetail } from "@/lib/match-detail";
 import { useMatchDetail } from "@/hooks/useMatchDetail";
@@ -76,17 +76,28 @@ export function MatchDetailPanel({ matchId }: { matchId: string }) {
                 </h4>
                 {fighters.length ? (
                   <>
-                    <MatchStatGroup
+                    <StatValueGroup
                       title="팀 잡기"
-                      metrics={[
+                      cards={[
                         {
-                          label: "팀 잡기 성공",
-                          count: fighters[0].team_throw_success_count,
-                        },
-                        {
-                          label: "팀 잡기 시도 · 성공률",
-                          count: fighters[0].team_throw_attempts,
-                          rate: fighters[0].team_throw_success_rate,
+                          title: "잡기 성공",
+                          values: [
+                            {
+                              label: "성공 횟수",
+                              value: fighters[0].team_throw_success_count,
+                              unit: "회",
+                            },
+                            {
+                              label: "시도 횟수",
+                              value: fighters[0].team_throw_attempts,
+                              unit: "회",
+                            },
+                            {
+                              label: "성공률",
+                              value: fighters[0].team_throw_success_rate,
+                              unit: "%",
+                            },
+                          ],
                         },
                       ]}
                     />

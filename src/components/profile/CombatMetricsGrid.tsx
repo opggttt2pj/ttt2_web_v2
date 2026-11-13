@@ -1,4 +1,4 @@
-import { StatMetricGroup } from "@/components/statistics/StatMetricGroup";
+import { StatValueGroup } from "@/components/statistics/StatMetricGroup";
 import { sumNullableCounts } from "@/lib/combat-statistics";
 import type { CombatMetrics } from "@/lib/player-combat-statistics";
 
@@ -9,74 +9,103 @@ export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {hasTeamThrow ? (
-        <StatMetricGroup
-          title="잡기 성공"
-          metrics={[
-            { label: "성공 횟수", count: stats.team_throw_success_count },
+        <StatValueGroup
+          title="잡기"
+          cards={[
             {
-              label: "시도 횟수",
-              count: stats.team_throw_attempts,
-              rate: stats.team_throw_success_rate,
+              title: "잡기 성공",
+              values: [
+                { label: "성공 횟수", value: stats.team_throw_success_count, unit: "회" },
+                { label: "시도 횟수", value: stats.team_throw_attempts, unit: "회" },
+                { label: "성공률", value: stats.team_throw_success_rate, unit: "%" },
+              ],
+            },
+            {
+              title: "잡기 풀기",
+              values: [
+                { label: "푼 횟수", value: stats.dodged_throw_count, unit: "회" },
+                { label: "잡힌 횟수", value: stats.thrown_count, unit: "회" },
+                { label: "성공률", value: stats.throw_defense_rate, unit: "%" },
+              ],
             },
           ]}
         />
-      ) : null}
+      ) : (
+        <StatValueGroup
+          title="잡기 풀기"
+          cards={[
+            {
+              title: "잡기 풀기",
+              values: [
+                { label: "푼 횟수", value: stats.dodged_throw_count, unit: "회" },
+                { label: "잡힌 횟수", value: stats.thrown_count, unit: "회" },
+                { label: "성공률", value: stats.throw_defense_rate, unit: "%" },
+              ],
+            },
+          ]}
+        />
+      )}
 
-      <StatMetricGroup
-        title="잡기 풀기"
-        metrics={[
-          { label: "푼 횟수", count: stats.dodged_throw_count },
-          {
-            label: "잡힌 횟수",
-            count: stats.thrown_count,
-            rate: stats.throw_defense_rate,
-          },
-        ]}
-      />
-
-      <StatMetricGroup
+      <StatValueGroup
         title="하단"
-        metrics={[
-          { label: "하단 성공", count: stats.low_blow_count },
+        cards={[
           {
-            label: "하단 시도 · 성공률",
-            count: sumNullableCounts(stats.low_blow_count, stats.low_blow_dodged_count),
-            rate: stats.low_blow_success_rate,
+            title: "하단 성공",
+            values: [
+              { label: "성공 횟수", value: stats.low_blow_count, unit: "회" },
+              {
+                label: "시도 횟수",
+                value: sumNullableCounts(stats.low_blow_count, stats.low_blow_dodged_count),
+                unit: "회",
+              },
+              { label: "성공률", value: stats.low_blow_success_rate, unit: "%" },
+            ],
           },
-          { label: "내가 피한 하단", count: stats.dodged_low_blow_count },
-          { label: "내가 하단에 맞음", count: stats.low_blowed_count },
           {
-            label: "하단 방어 시도 · 성공률",
-            count: sumNullableCounts(stats.dodged_low_blow_count, stats.low_blowed_count),
-            rate: stats.low_blow_defense_rate,
+            title: "하단 가드",
+            values: [
+              { label: "가드 횟수", value: stats.dodged_low_blow_count, unit: "회" },
+              {
+                label: "적 하단 공격 횟수",
+                value: sumNullableCounts(stats.dodged_low_blow_count, stats.low_blowed_count),
+                unit: "회",
+              },
+              { label: "가드율", value: stats.low_blow_defense_rate, unit: "%" },
+            ],
           },
         ]}
       />
 
-      <StatMetricGroup
+      <StatValueGroup
         title="카운터"
-        metrics={[
-          { label: "카운터 적중", count: stats.counter_attack_count },
-          { label: "카운터 피격", count: stats.counter_attacked_count },
+        cards={[
+          {
+            title: "카운터",
+            values: [
+              { label: "적중 횟수", value: stats.counter_attack_count, unit: "회" },
+              { label: "피격 횟수", value: stats.counter_attacked_count, unit: "회" },
+            ],
+          },
         ]}
       />
 
-      <StatMetricGroup
+      <StatValueGroup
         title="태그 · 콤보"
-        metrics={[
-          { label: "태그 어설트", count: stats.tag_assault_count },
-          { label: "태그 콤보", count: stats.tag_combo_count },
+        cards={[
           {
-            label: "일반 콤보",
-            count: stats.combo_hit_plain,
+            title: "태그",
+            values: [
+              { label: "태그 어설트", value: stats.tag_assault_count, unit: "회" },
+              { label: "태그 콤보", value: stats.tag_combo_count, unit: "회" },
+            ],
           },
           {
-            label: "벽 콤보",
-            count: stats.combo_hit_wall,
-          },
-          {
-            label: "기믹 콤보",
-            count: stats.combo_hit_gimmick,
+            title: "콤보",
+            values: [
+              { label: "일반 콤보", value: stats.combo_hit_plain, unit: "회" },
+              { label: "벽 콤보", value: stats.combo_hit_wall, unit: "회" },
+              { label: "기믹 콤보", value: stats.combo_hit_gimmick, unit: "회" },
+            ],
           },
         ]}
       />

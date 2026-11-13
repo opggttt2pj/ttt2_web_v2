@@ -106,10 +106,18 @@ export function StatValueGroup({
               )}`}
             >
               {card.values.map((item) => (
+                <div className="min-w-0" key={`label-${item.label}`}>
+                  <p className="text-[10px] leading-tight text-[var(--muted)]">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            <div
+              className={`mt-1 grid gap-2 ${valueColumnCount(card.values.length)}`}
+            >
+              {card.values.map((item) => (
                 <div className="min-w-0" key={item.label}>
-                  <p className="text-[10px] text-[var(--muted)]">{item.label}</p>
                   <p
-                    className={`mt-0.5 text-sm font-bold ${
+                    className={`text-sm font-bold tabular-nums ${
                       item.unit === "%" ? "text-[var(--cyan)]" : "text-[var(--text)]"
                     }`}
                   >

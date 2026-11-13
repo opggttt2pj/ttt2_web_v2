@@ -5,8 +5,10 @@ export type RivalCombatStats = {
   dodged_throw_count: number | null;
   throw_defense_attempts: number | null;
   throw_defense_rate: number | null;
+  low_blow_count: number | null;
   low_blow_attempts: number | null;
   low_blow_success_rate: number | null;
+  dodged_low_blow_count: number | null;
   low_blow_defense_attempts: number | null;
   low_blow_defense_rate: number | null;
 };
@@ -142,6 +144,10 @@ function parseRivalCombatStats(
       item.throw_defense_rate,
       `${context} 잡기 방어 성공률`,
     ),
+    low_blow_count: nullableCount(
+      item.low_blow_count,
+      `${context} 하단 성공`,
+    ),
     low_blow_attempts: nullableCount(
       item.low_blow_attempts,
       `${context} 하단 시도`,
@@ -149,6 +155,10 @@ function parseRivalCombatStats(
     low_blow_success_rate: nullablePercentage(
       item.low_blow_success_rate,
       `${context} 하단 성공률`,
+    ),
+    dodged_low_blow_count: nullableCount(
+      item.dodged_low_blow_count,
+      `${context} 하단 가드`,
     ),
     low_blow_defense_attempts: nullableCount(
       item.low_blow_defense_attempts,
