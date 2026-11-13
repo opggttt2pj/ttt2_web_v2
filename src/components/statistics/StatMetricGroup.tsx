@@ -58,3 +58,69 @@ export function StatMetricGroup({
     </section>
   );
 }
+
+export type StatValueItem = {
+  label: string;
+  value: number | null;
+  unit?: "회" | "%";
+};
+
+export type StatValueCard = {
+  title: string;
+  values: StatValueItem[];
+};
+
+function valueLabel(item: StatValueItem) {
+  if (item.value === null) return "—";
+  return item.unit === "%" ? `${item.value.toFixed(1)}%` : `${item.value}회`;
+}
+
+function valueColumnCount(length: number) {
+  if (length >= 3) return "grid-cols-3";
+  if (length === 2) return "grid-cols-2";
+  return "grid-cols-1";
+}
+
+export function StatValueGroup({
+  title,
+  cards,
+}: {
+  title: string;
+  cards: StatValueCard[];
+}) {
+  return (
+    <section className="rounded-lg border border-[var(--line)] bg-[rgba(5,13,26,0.38)] px-3 py-2">
+      <h5 className="mb-2 text-xs font-bold text-[var(--text)]">{title}</h5>
+      <div className="grid gap-2">
+        {cards.map((card) => (
+          <div
+            className="rounded-lg border border-[var(--line)] bg-[rgba(12,21,32,0.65)] px-2.5 py-2"
+            key={card.title}
+          >
+            <h6 className="text-xs font-semibold text-[var(--text)]">
+              {card.title}
+            </h6>
+            <div
+              className={`mt-2 grid gap-2 border-t border-[var(--line)]/70 pt-2 ${valueColumnCount(
+                card.values.length,
+              )}`}
+            >
+              {card.values.map((item) => (
+                <div className="min-w-0" key={item.label}>
+                  <p className="text-[10px] text-[var(--muted)]">{item.label}</p>
+                  <p
+                    className={`mt-0.5 text-sm font-bold ${
+                      item.unit === "%" ? "text-[var(--cyan)]" : "text-[var(--text)]"
+                    }`}
+                  >
+                    {valueLabel(item)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

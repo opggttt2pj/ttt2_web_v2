@@ -1,5 +1,6 @@
 import { CharacterImage } from "@/components/matches/CharacterImage";
 import { MatchStatGroup } from "@/components/matches/MatchStatGroup";
+import { StatValueGroup } from "@/components/statistics/StatMetricGroup";
 import { sumNullableCounts } from "@/lib/combat-statistics";
 import type { MatchFighterDetail } from "@/lib/match-detail";
 
@@ -50,38 +51,56 @@ export function MatchFighterStats({
       </header>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <MatchStatGroup
-          title="잡기 시도"
-          metrics={[{ label: "내가 시도한 잡기", count: fighter.throw_count }]}
-        />
-
-        <MatchStatGroup
-          title="잡기 풀기"
-          metrics={[
-            { label: "내가 푼 잡기", count: fighter.dodged_throw_count },
+        <StatValueGroup
+          title="잡기"
+          cards={[
             {
-              label: "잡기 당한 시도 · 방어율",
-              count: fighter.thrown_count,
-              rate: fighter.throw_defense_rate,
+              title: "잡기 시도",
+              values: [{ label: "시도 횟수", value: fighter.throw_count, unit: "회" }],
+            },
+            {
+              title: "잡기 풀기",
+              values: [
+                { label: "푼 횟수", value: fighter.dodged_throw_count, unit: "회" },
+                { label: "잡힌 횟수", value: fighter.thrown_count, unit: "회" },
+                { label: "성공률", value: fighter.throw_defense_rate, unit: "%" },
+              ],
             },
           ]}
         />
 
-        <MatchStatGroup
+        <StatValueGroup
           title="하단"
-          metrics={[
-            { label: "하단 성공", count: fighter.low_blow_count },
+          cards={[
             {
-              label: "하단 시도 · 성공률",
-              count: sumNullableCounts(fighter.low_blow_count, fighter.low_blow_dodged_count),
-              rate: fighter.low_blow_success_rate,
+              title: "하단 성공",
+              values: [
+                { label: "성공 횟수", value: fighter.low_blow_count, unit: "회" },
+                {
+                  label: "시도 횟수",
+                  value: sumNullableCounts(
+                    fighter.low_blow_count,
+                    fighter.low_blow_dodged_count,
+                  ),
+                  unit: "회",
+                },
+                { label: "성공률", value: fighter.low_blow_success_rate, unit: "%" },
+              ],
             },
-            { label: "내가 피한 하단", count: fighter.dodged_low_blow_count },
-            { label: "내가 하단에 맞음", count: fighter.low_blowed_count },
             {
-              label: "하단 방어 시도 · 성공률",
-              count: sumNullableCounts(fighter.dodged_low_blow_count, fighter.low_blowed_count),
-              rate: fighter.low_blow_defense_rate,
+              title: "하단 가드",
+              values: [
+                { label: "가드 횟수", value: fighter.dodged_low_blow_count, unit: "회" },
+                {
+                  label: "적 하단 공격 횟수",
+                  value: sumNullableCounts(
+                    fighter.dodged_low_blow_count,
+                    fighter.low_blowed_count,
+                  ),
+                  unit: "회",
+                },
+                { label: "가드율", value: fighter.low_blow_defense_rate, unit: "%" },
+              ],
             },
           ]}
         />
