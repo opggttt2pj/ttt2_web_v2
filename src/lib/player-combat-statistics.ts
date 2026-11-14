@@ -25,13 +25,33 @@ export const PLAYER_COMBAT_RATE_FIELDS = [
   "low_blow_defense_rate",
 ] as const;
 
+// 최고 콤보 타수: 정수이지만, 컬럼이 없는 구버전 응답에서는 null 로 버팁니다.
+export const PLAYER_COMBAT_MAX_FIELDS = [
+  "combo_hit_plain_max",
+  "combo_hit_gimmick_max",
+] as const;
+
+// 경기당 평균: 소수 1자리 값이며, 구버전 응답에서는 null 로 버팁니다.
+export const PLAYER_COMBAT_AVERAGE_FIELDS = [
+  "combo_hit_plain_avg",
+  "combo_hit_gimmick_avg",
+  "tag_assault_avg",
+  "tag_combo_avg",
+] as const;
+
 export type PlayerCombatCountField =
   (typeof PLAYER_COMBAT_COUNT_FIELDS)[number];
 export type PlayerCombatRateField =
   (typeof PLAYER_COMBAT_RATE_FIELDS)[number];
+export type PlayerCombatMaxField = (typeof PLAYER_COMBAT_MAX_FIELDS)[number];
+export type PlayerCombatAverageField =
+  (typeof PLAYER_COMBAT_AVERAGE_FIELDS)[number];
 
 export type CombatMetrics = Record<
-  PlayerCombatCountField | PlayerCombatRateField,
+  | PlayerCombatCountField
+  | PlayerCombatRateField
+  | PlayerCombatMaxField
+  | PlayerCombatAverageField,
   number | null
 >;
 
@@ -93,6 +113,21 @@ function nullablePercentage(value: unknown, context: string) {
   return percentage(value, context);
 }
 
+// 구버전 응답에는 없는 신규 필드라, 값이 없으면 null 로 버팁니다.
+function optionalCount(value: unknown, context: string): number | null {
+  if (value === null || value === undefined) return null;
+  return integer(value, context);
+}
+
+// 평균값은 소수 1자리 실수라 정수 검증 없이 0 이상 유한수만 허용합니다.
+function optionalAverage(value: unknown, context: string): number | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    throw new Error(`${context} 값이 올바르지 않습니다.`);
+  }
+  return value;
+}
+
 function parseCombatMetrics(value: unknown, context: string): CombatMetrics {
   const payload = record(value, context);
   const counts = Object.fromEntries(
@@ -107,8 +142,20 @@ function parseCombatMetrics(value: unknown, context: string): CombatMetrics {
       nullablePercentage(payload[field], `${context} ${field}`),
     ]),
   ) as Record<PlayerCombatRateField, number | null>;
+  const maxes = Object.fromEntries(
+    PLAYER_COMBAT_MAX_FIELDS.map((field) => [
+      field,
+      optionalCount(payload[field], `${context} ${field}`),
+    ]),
+  ) as Record<PlayerCombatMaxField, number | null>;
+  const averages = Object.fromEntries(
+    PLAYER_COMBAT_AVERAGE_FIELDS.map((field) => [
+      field,
+      optionalAverage(payload[field], `${context} ${field}`),
+    ]),
+  ) as Record<PlayerCombatAverageField, number | null>;
 
-  return { ...counts, ...rates };
+  return { ...counts, ...rates, ...maxes, ...averages };
 }
 
 export function parsePlayerCombatStatistics(

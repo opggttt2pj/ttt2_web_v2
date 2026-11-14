@@ -47,6 +47,7 @@ function ProfileContent({ profile }: { profile: string }) {
   const [selectedMapId, setSelectedMapId] = useState<number | null>(null);
   const [previewMapId, setPreviewMapId] = useState<number | null>(null);
   const [mapPickerOpen, setMapPickerOpen] = useState(false);
+  const [expandedRival, setExpandedRival] = useState<string | null>(null);
   const {
     data: profileStatistics,
     key: statisticsRequestKey,
@@ -509,7 +510,29 @@ function ProfileContent({ profile }: { profile: string }) {
                             </b>
                           </div>
                           {rival.stats ? (
-                            <section className="mt-3 rounded-xl border border-cyan-400/15 bg-slate-950/40 p-3">
+                            <div
+                              className="mt-2"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                            >
+                              <button
+                                type="button"
+                                className="theme-button inline-flex min-h-8 items-center gap-2 rounded-lg px-3 py-1 text-xs font-semibold transition-colors hover:border-cyan-400/40 hover:text-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
+                                aria-expanded={expandedRival === rival.name}
+                                aria-controls={`rival-detail-${rival.name}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setExpandedRival(expandedRival === rival.name ? null : rival.name);
+                                }}
+                              >
+                                {expandedRival === rival.name ? "상세 스탯 닫기" : "상세 스탯 보기"}
+                                <span aria-hidden="true">{expandedRival === rival.name ? "−" : "+"}</span>
+                              </button>
+                              {expandedRival === rival.name ? (
+                            <section id={`rival-detail-${rival.name}`} className="mt-2 rounded-xl border border-cyan-400/15 bg-slate-950/40 p-3">
                               <h4 className="mb-2 text-[10px] font-bold tracking-[0.08em] text-slate-400">
                                 상대별 전투 스탯
                               </h4>
@@ -591,6 +614,8 @@ function ProfileContent({ profile }: { profile: string }) {
                               ))}
                               </div>
                             </section>
+                              ) : null}
+                            </div>
                           ) : null}
                         </>
                       );

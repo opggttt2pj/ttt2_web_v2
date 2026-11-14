@@ -11,6 +11,7 @@ export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
       {hasTeamThrow ? (
         <StatValueGroup
           title="잡기"
+          columns={3}
           cards={[
             {
               title: "잡기 성공",
@@ -33,6 +34,7 @@ export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
       ) : (
         <StatValueGroup
           title="잡기 풀기"
+          columns={3}
           cards={[
             {
               title: "잡기 풀기",
@@ -48,6 +50,7 @@ export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
 
       <StatValueGroup
         title="하단"
+        columns={3}
         cards={[
           {
             title: "하단 성공",
@@ -78,6 +81,7 @@ export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
 
       <StatValueGroup
         title="카운터"
+        columns={3}
         cards={[
           {
             title: "카운터",
@@ -91,20 +95,34 @@ export function CombatMetricsGrid({ stats }: { stats: CombatMetrics }) {
 
       <StatValueGroup
         title="태그 · 콤보"
+        columns={2}
         cards={[
           {
-            title: "태그",
+            title: "태그 어썰트 콤보",
             values: [
-              { label: "태그 어설트", value: stats.tag_assault_count, unit: "회" },
-              { label: "태그 콤보", value: stats.tag_combo_count, unit: "회" },
+              { label: "총 횟수", value: stats.tag_assault_count, unit: "회" },
+              { label: "경기당 평균 횟수", value: stats.tag_assault_avg, unit: "회" },
             ],
           },
           {
-            title: "콤보",
+            title: "태그 체인지 콤보",
             values: [
-              { label: "일반 콤보", value: stats.combo_hit_plain, unit: "회" },
-              { label: "벽 콤보", value: stats.combo_hit_wall, unit: "회" },
-              { label: "기믹 콤보", value: stats.combo_hit_gimmick, unit: "회" },
+              { label: "총 횟수", value: stats.tag_combo_count, unit: "회" },
+              { label: "경기당 평균 횟수", value: stats.tag_combo_avg, unit: "회" },
+            ],
+          },
+          {
+            title: "최고 콤보 타수",
+            values: [
+              { label: "일반", value: stats.combo_hit_plain_max, unit: "타" },
+              { label: "기믹", value: stats.combo_hit_gimmick_max, unit: "타" },
+            ],
+          },
+          {
+            title: "평균 콤보 타수",
+            values: [
+              { label: "일반", value: stats.combo_hit_plain_avg, unit: "타" },
+              { label: "기믹", value: stats.combo_hit_gimmick_avg, unit: "타" },
             ],
           },
         ]}

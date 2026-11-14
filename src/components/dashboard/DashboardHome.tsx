@@ -180,8 +180,8 @@ export function DashboardHome() {
             <PanelHeader
               eyebrow="TEAM META"
               title="고승률 태그 조합"
-              description="10전 이상 기록된 조합을 승률 순으로 표시합니다."
-              badge="10전 이상 · TOP 6"
+              description="20전 이상 기록된 조합을 승률 순으로 표시합니다."
+              badge="20전 이상 · TOP 6"
             />
             <HorizontalRateChart
               animationOnly

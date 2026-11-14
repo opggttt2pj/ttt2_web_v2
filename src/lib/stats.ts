@@ -91,7 +91,7 @@ export function topCombos(matches: Match[], limit = 6) {
   });
 
   return [...combos.values()]
-    .filter((combo) => combo.games >= 10)
+    .filter((combo) => combo.games >= 20)
     .map((combo) => ({ ...combo, rate: (combo.wins / combo.games) * 100 }))
     .sort((a, b) => b.rate - a.rate || b.games - a.games)
     .slice(0, limit);

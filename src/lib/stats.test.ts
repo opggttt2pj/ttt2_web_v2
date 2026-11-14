@@ -155,17 +155,27 @@ describe("topTenPlayers", () => {
 });
 
 describe("topCombos", () => {
-  it("requires at least 10 games", () => {
-    const matches = Array.from({ length: 9 }, (_, index) =>
-      match({
-        id: String(index),
-        p1Name: "Alice",
-        p2Name: "Bob",
-        winner: "Alice",
-        p1Characters: [0, 64],
+  it("requires at least 20 games", () => {
+    const makeMatches = (count: number) =>
+      Array.from({ length: count }, (_, index) =>
+        match({
+          id: String(index),
+          p1Name: "Alice",
+          p2Name: "Bob",
+          winner: "Alice",
+          p1Characters: [0, 64],
+        }),
+      );
+
+    expect(topCombos(makeMatches(19))).toHaveLength(0);
+    expect(topCombos(makeMatches(20))).toContainEqual(
+      expect.objectContaining({
+        ids: [0, 64],
+        games: 20,
+        wins: 20,
+        rate: 100,
       }),
     );
-    expect(topCombos(matches)).toHaveLength(0);
   });
 });
 

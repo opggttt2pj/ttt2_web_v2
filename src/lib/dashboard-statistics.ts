@@ -81,7 +81,7 @@ export function parseDashboardStatistics(value: unknown): DashboardStatistics {
       throw new Error("대시보드 조합 집계 값이 올바르지 않습니다.");
     }
     return { ids, games, wins, rate: rate(item.rate) };
-  });
+  }).filter((combo) => combo.games >= 20);
 
   let rising: DashboardStatistics["rising"] = null;
   if (payload.rising !== null) {

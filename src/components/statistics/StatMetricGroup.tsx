@@ -2,10 +2,11 @@ export type StatMetric = {
   label: string;
   count: number | null;
   rate?: number | null;
+  unit?: "회" | "타";
 };
 
-function countLabel(value: number | null) {
-  return value === null ? "—" : `${value}회`;
+function countLabel(value: number | null, unit?: "회" | "타") {
+  return value === null ? "—" : `${value}${unit ?? "회"}`;
 }
 
 function rateLabel(value: number | null) {
@@ -16,18 +17,25 @@ function MetricLine({
   label,
   count,
   rate,
+  unit,
 }: StatMetric) {
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_3rem_3.75rem] items-center gap-2 border-b border-[var(--line)]/70 py-1.5 last:border-0">
       <span className="truncate text-xs text-[var(--muted)]">{label}</span>
       <span className="text-right text-xs font-semibold tabular-nums text-[var(--text)]">
-        {countLabel(count)}
+        {countLabel(count, unit)}
       </span>
       <span className="text-right text-xs font-semibold tabular-nums text-[var(--cyan)]">
         {rate === undefined ? "" : rateLabel(rate)}
       </span>
     </div>
   );
+}
+
+function countHeaderText(metrics: StatMetric[]) {
+  const units = new Set(metrics.map((metric) => metric.unit ?? "회"));
+  if (units.size > 1) return "";
+  return units.has("타") ? "타수" : "횟수";
 }
 
 export function StatMetricGroup({
@@ -38,13 +46,14 @@ export function StatMetricGroup({
   metrics: StatMetric[];
 }) {
   const hasRateColumn = metrics.some((metric) => metric.rate !== undefined);
+  const countHeader = countHeaderText(metrics);
 
   return (
     <section className="rounded-lg border border-[var(--line)] bg-[rgba(5,13,26,0.38)] px-3 py-2">
       <div className="mb-1 grid grid-cols-[minmax(0,1fr)_3rem_3.75rem] items-center gap-2">
         <h5 className="text-xs font-bold text-[var(--text)]">{title}</h5>
         <span className="text-right text-[9px] font-medium text-[var(--muted)]">
-          횟수
+          {countHeader}
         </span>
         {hasRateColumn ? (
           <span className="text-right text-[9px] font-medium text-[var(--muted)]">
@@ -62,7 +71,7 @@ export function StatMetricGroup({
 export type StatValueItem = {
   label: string;
   value: number | null;
-  unit?: "회" | "%";
+  unit?: "회" | "%" | "타";
 };
 
 export type StatValueCard = {
@@ -72,10 +81,14 @@ export type StatValueCard = {
 
 function valueLabel(item: StatValueItem) {
   if (item.value === null) return "—";
-  return item.unit === "%" ? `${item.value.toFixed(1)}%` : `${item.value}회`;
+  if (item.unit === "%") return `${item.value.toFixed(1)}%`;
+  return `${item.value}${item.unit ?? "회"}`;
 }
 
-function valueColumnCount(length: number) {
+function valueColumnCount(length: number, columns?: 1 | 2 | 3) {
+  if (columns === 3) return "grid-cols-3";
+  if (columns === 2) return "grid-cols-2";
+  if (columns === 1) return "grid-cols-1";
   if (length >= 3) return "grid-cols-3";
   if (length === 2) return "grid-cols-2";
   return "grid-cols-1";
@@ -84,9 +97,11 @@ function valueColumnCount(length: number) {
 export function StatValueGroup({
   title,
   cards,
+  columns,
 }: {
   title: string;
   cards: StatValueCard[];
+  columns?: 1 | 2 | 3;
 }) {
   return (
     <section className="rounded-lg border border-[var(--line)] bg-[rgba(5,13,26,0.38)] px-3 py-2">
@@ -103,6 +118,7 @@ export function StatValueGroup({
             <div
               className={`mt-2 grid gap-2 border-t border-[var(--line)]/70 pt-2 ${valueColumnCount(
                 card.values.length,
+                columns,
               )}`}
             >
               {card.values.map((item) => (
@@ -112,7 +128,7 @@ export function StatValueGroup({
               ))}
             </div>
             <div
-              className={`mt-1 grid gap-2 ${valueColumnCount(card.values.length)}`}
+              className={`mt-1 grid gap-2 ${valueColumnCount(card.values.length, columns)}`}
             >
               {card.values.map((item) => (
                 <div className="min-w-0" key={item.label}>

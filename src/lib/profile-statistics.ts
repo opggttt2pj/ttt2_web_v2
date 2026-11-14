@@ -19,6 +19,12 @@ export type ThrowDefensePeriodRates = {
   last_30_days: number | null;
 };
 
+export type LowBlowDefensePeriodRates = {
+  today: number | null;
+  last_7_days: number | null;
+  last_30_days: number | null;
+};
+
 export type ProfileStatistics = {
   name: string;
   summary: {
@@ -57,11 +63,15 @@ export type ProfileStatistics = {
     daily: Array<[number, number]>;
     throw_defense_rates: Array<number | null>;
     throw_defense_period_rates: ThrowDefensePeriodRates;
+    low_blow_defense_rates: Array<number | null>;
+    low_blow_defense_period_rates: LowBlowDefensePeriodRates;
     teams: Array<{
       ids: number[];
       daily: Array<[number, number]>;
       throw_defense_rates: Array<number | null>;
       throw_defense_period_rates: ThrowDefensePeriodRates;
+      low_blow_defense_rates: Array<number | null>;
+      low_blow_defense_period_rates: LowBlowDefensePeriodRates;
     }>;
   };
 };
@@ -212,6 +222,26 @@ function parseThrowDefensePeriodRates(
   };
 }
 
+function parseLowBlowDefensePeriodRates(
+  value: unknown,
+  context: string,
+): LowBlowDefensePeriodRates {
+  if (value === null || value === undefined) {
+    return { today: null, last_7_days: null, last_30_days: null };
+  }
+  const rates = record(value, context);
+  const parseRate = (key: keyof LowBlowDefensePeriodRates) => {
+    const rate = rates[key];
+    if (rate === null) return null;
+    return percentage(rate, `${context} ${key}`);
+  };
+  return {
+    today: parseRate("today"),
+    last_7_days: parseRate("last_7_days"),
+    last_30_days: parseRate("last_30_days"),
+  };
+}
+
 function parseProfileTrend(value: unknown): ProfileStatistics["trend"] {
   const trend = record(value, "경기력 추세");
   if (trend.timezone !== "Asia/Seoul") {
@@ -247,6 +277,19 @@ function parseProfileTrend(value: unknown): ProfileStatistics["trend"] {
   const throw_defense_period_rates = parseThrowDefensePeriodRates(
     trend.throw_defense_period_rates,
     "전체 기간별 잡기 풀기 성공률",
+  );
+  const low_blow_defense_rates =
+    trend.low_blow_defense_rates === undefined ||
+    trend.low_blow_defense_rates === null
+      ? dates.map(() => null)
+      : parseDailyRates(
+          trend.low_blow_defense_rates,
+          dates,
+          "전체 하단 가드율 추세",
+        );
+  const low_blow_defense_period_rates = parseLowBlowDefensePeriodRates(
+    trend.low_blow_defense_period_rates,
+    "전체 기간별 하단 가드율",
   );
 
   if (!Array.isArray(trend.teams)) {
@@ -284,6 +327,19 @@ function parseProfileTrend(value: unknown): ProfileStatistics["trend"] {
       item.throw_defense_period_rates,
       "팀 조합 기간별 잡기 풀기 성공률",
     );
+    const teamLowBlowDefenseRates =
+      item.low_blow_defense_rates === undefined ||
+      item.low_blow_defense_rates === null
+        ? dates.map(() => null)
+        : parseDailyRates(
+            item.low_blow_defense_rates,
+            dates,
+            "팀 조합 하단 가드율 추세",
+          );
+    const teamLowBlowDefensePeriodRates = parseLowBlowDefensePeriodRates(
+      item.low_blow_defense_period_rates,
+      "팀 조합 기간별 하단 가드율",
+    );
     if (!teamDaily.some(([games]) => games > 0)) {
       throw new Error("팀 조합 경기력 추세에 경기 기록이 없습니다.");
     }
@@ -292,6 +348,8 @@ function parseProfileTrend(value: unknown): ProfileStatistics["trend"] {
       daily: teamDaily,
       throw_defense_rates: teamThrowDefenseRates,
       throw_defense_period_rates: teamThrowDefensePeriodRates,
+      low_blow_defense_rates: teamLowBlowDefenseRates,
+      low_blow_defense_period_rates: teamLowBlowDefensePeriodRates,
     };
   });
 
@@ -301,6 +359,8 @@ function parseProfileTrend(value: unknown): ProfileStatistics["trend"] {
     daily,
     throw_defense_rates,
     throw_defense_period_rates,
+    low_blow_defense_rates,
+    low_blow_defense_period_rates,
     teams,
   };
 }

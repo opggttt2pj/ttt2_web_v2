@@ -20,6 +20,12 @@ function metrics() {
     combo_hit_plain: 2,
     combo_hit_wall: 1,
     combo_hit_gimmick: 1,
+    combo_hit_plain_max: 9,
+    combo_hit_gimmick_max: 3,
+    combo_hit_plain_avg: 4.5,
+    combo_hit_gimmick_avg: 1.5,
+    tag_assault_avg: 0.5,
+    tag_combo_avg: 0.5,
     team_throw_success_rate: 58.3,
     throw_defense_rate: 50,
     low_blow_success_rate: 100,
@@ -87,5 +93,33 @@ describe("parsePlayerCombatStatistics", () => {
     expect(() => parsePlayerCombatStatistics(invalid)).toThrow(
       "중복 캐릭터",
     );
+  });
+
+  it("parses per-match average and max combo/tag values", () => {
+    const result = parsePlayerCombatStatistics(payload());
+
+    expect(result.overall.combo_hit_plain_max).toBe(9);
+    expect(result.overall.combo_hit_gimmick_max).toBe(3);
+    expect(result.overall.combo_hit_plain_avg).toBe(4.5);
+    expect(result.overall.tag_assault_avg).toBe(0.5);
+    expect(result.characters[0].stats.combo_hit_gimmick_avg).toBe(1.5);
+  });
+
+  it("treats missing average and max fields as null", () => {
+    const legacy = payload();
+    const legacyMetrics = { ...legacy.overall } as Record<string, unknown>;
+    delete legacyMetrics.combo_hit_plain_max;
+    delete legacyMetrics.combo_hit_gimmick_max;
+    delete legacyMetrics.combo_hit_plain_avg;
+    delete legacyMetrics.combo_hit_gimmick_avg;
+    delete legacyMetrics.tag_assault_avg;
+    delete legacyMetrics.tag_combo_avg;
+    legacy.overall = legacyMetrics as typeof legacy.overall;
+
+    const result = parsePlayerCombatStatistics(legacy);
+
+    expect(result.overall.combo_hit_plain_max).toBeNull();
+    expect(result.overall.combo_hit_plain_avg).toBeNull();
+    expect(result.overall.tag_assault_avg).toBeNull();
   });
 });

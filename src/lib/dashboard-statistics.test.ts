@@ -7,7 +7,7 @@ function payload() {
     totalPlayers: 3,
     todayMatches: 0,
     characters: [{ id: 0, count: 20, rate: 25 }],
-    combos: [{ ids: [0, 64], games: 10, wins: 7, rate: 70 }],
+    combos: [{ ids: [0, 64], games: 20, wins: 14, rate: 70 }],
     rising: null,
     activity: Array.from({ length: 30 }, (_, index) => ({
       key: `2026-09-${String(index + 1).padStart(2, "0")}`,
@@ -24,7 +24,7 @@ describe("parseDashboardStatistics", () => {
       totalPlayers: 3,
       todayMatches: 0,
       characters: [{ id: 0, count: 20, rate: 25 }],
-      combos: [{ ids: [0, 64], games: 10, wins: 7, rate: 70 }],
+      combos: [{ ids: [0, 64], games: 20, wins: 14, rate: 70 }],
       activity: expect.arrayContaining([{ key: "2026-09-01", label: "9/1", count: 20 }]),
     });
   });
@@ -43,7 +43,13 @@ describe("parseDashboardStatistics", () => {
 
   it("rejects invalid win totals", () => {
     const value = payload();
-    value.combos[0].wins = 11;
+    value.combos[0].wins = 21;
     expect(() => parseDashboardStatistics(value)).toThrow(/집계 값/);
+  });
+
+  it("filters cached combos below the 20-game minimum", () => {
+    const value = payload();
+    value.combos[0].games = 19;
+    expect(parseDashboardStatistics(value).combos).toEqual([]);
   });
 });

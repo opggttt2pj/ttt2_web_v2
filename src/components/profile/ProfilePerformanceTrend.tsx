@@ -34,6 +34,8 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
         daily: team.daily,
         throwDefenseRates: team.throw_defense_rates,
         throwDefensePeriodRates: team.throw_defense_period_rates,
+        lowBlowDefenseRates: team.low_blow_defense_rates,
+        lowBlowDefensePeriodRates: team.low_blow_defense_period_rates,
       })),
     [trend.teams],
   );
@@ -44,8 +46,14 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
   const selectedThrowDefensePeriodRates = selectedFilter
     ? selectedFilter.throwDefensePeriodRates
     : trend.throw_defense_period_rates;
+  const selectedLowBlowDefenseRates =
+    selectedFilter?.lowBlowDefenseRates ?? trend.low_blow_defense_rates;
+  const selectedLowBlowDefensePeriodRates = selectedFilter
+    ? selectedFilter.lowBlowDefensePeriodRates
+    : trend.low_blow_defense_period_rates;
   const periodKey = period === 1 ? "today" : period === 7 ? "last_7_days" : "last_30_days";
   const throwDefensePeriodRate = selectedThrowDefensePeriodRates[periodKey];
+  const lowBlowDefensePeriodRate = selectedLowBlowDefensePeriodRates[periodKey];
   const startIndex = trend.dates.length - period;
   const chartData = trend.dates.slice(startIndex).map((date, index) => {
     const dataIndex = startIndex + index;
@@ -58,6 +66,7 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
       losses: games - wins,
       rate: games === 0 ? null : (wins / games) * 100,
       throwDefenseRate: selectedThrowDefenseRates[dataIndex],
+      lowBlowDefenseRate: selectedLowBlowDefenseRates[dataIndex],
     };
   });
   const totals = chartData.reduce(
@@ -108,7 +117,7 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
         </div>
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
         {[
           ["경기", `${totals.games}전`],
           ["승리", `${totals.wins}승`],
@@ -119,6 +128,12 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
             throwDefensePeriodRate === null
               ? "기록 없음"
               : `${throwDefensePeriodRate.toFixed(1)}%`,
+          ],
+          [
+            "하단 가드율",
+            lowBlowDefensePeriodRate === null
+              ? "기록 없음"
+              : `${lowBlowDefensePeriodRate.toFixed(1)}%`,
           ],
         ].map(([label, value]) => (
           <div className="rounded-xl border border-slate-700/80 bg-slate-950/35 px-3 py-2.5" key={label}>
@@ -132,7 +147,7 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
         <div
           className="h-56 w-full min-w-0"
           role="img"
-          aria-label={`${period === 1 ? "오늘" : `최근 ${period}일`} 일별 승률과 잡기 풀기 성공률 추세`}
+          aria-label={`${period === 1 ? "오늘" : `최근 ${period}일`} 일별 승률, 잡기 풀기 성공률, 하단 가드율 추세`}
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 12, bottom: 2, left: -16 }}>
@@ -197,6 +212,17 @@ export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
                 connectNulls={false}
                 dot={{ r: 3, fill: "#f6bd4b", strokeWidth: 0 }}
                 activeDot={{ r: 6, fill: "#fff", stroke: "#f6bd4b", strokeWidth: 3 }}
+                isAnimationActive={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="lowBlowDefenseRate"
+                name="하단 가드율"
+                stroke="#7bf0b5"
+                strokeWidth={2.5}
+                connectNulls={false}
+                dot={{ r: 3, fill: "#7bf0b5", strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: "#fff", stroke: "#7bf0b5", strokeWidth: 3 }}
                 isAnimationActive={false}
               />
             </LineChart>

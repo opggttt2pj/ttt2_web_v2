@@ -116,19 +116,17 @@ export function MatchFighterStats({
         <MatchStatGroup
           title="태그 · 콤보"
           metrics={[
-            { label: "태그 어설트", count: fighter.tag_assault_count },
-            { label: "태그 콤보", count: fighter.tag_combo_count },
+            { label: "태그 어썰트 콤보", count: fighter.tag_assault_count },
+            { label: "태그 체인지 콤보", count: fighter.tag_combo_count },
             {
-              label: "일반 콤보",
+              label: "최대 콤보 타수(일반)",
               count: fighter.combo_hit_plain,
+              unit: "타",
             },
             {
-              label: "벽 콤보",
-              count: fighter.combo_hit_wall,
-            },
-            {
-              label: "기믹 콤보",
+              label: "최대 콤보 타수(기믹)",
               count: fighter.combo_hit_gimmick,
+              unit: "타",
             },
           ]}
         />

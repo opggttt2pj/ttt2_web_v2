@@ -79,11 +79,23 @@ function payload(): {
       last_7_days: number | null;
       last_30_days: number | null;
     };
+    low_blow_defense_rates: Array<number | null>;
+    low_blow_defense_period_rates: {
+      today: number | null;
+      last_7_days: number | null;
+      last_30_days: number | null;
+    };
     teams: Array<{
       ids: [number, number];
       daily: Array<[number, number]>;
       throw_defense_rates: Array<number | null>;
       throw_defense_period_rates: {
+        today: number | null;
+        last_7_days: number | null;
+        last_30_days: number | null;
+      };
+      low_blow_defense_rates: Array<number | null>;
+      low_blow_defense_period_rates: {
         today: number | null;
         last_7_days: number | null;
         last_30_days: number | null;
@@ -99,6 +111,7 @@ function payload(): {
     index === 29 ? [2, 1] : [0, 0],
   );
   const throwDefenseRates = dates.map((_, index) => (index === 29 ? 75 : null));
+  const lowBlowDefenseRates = dates.map((_, index) => (index === 29 ? 80 : null));
   return {
     name: "Alice",
     summary: {
@@ -131,6 +144,12 @@ function payload(): {
         last_7_days: 75,
         last_30_days: 66.7,
       },
+      low_blow_defense_rates: [...lowBlowDefenseRates],
+      low_blow_defense_period_rates: {
+        today: 60,
+        last_7_days: 80,
+        last_30_days: 72.5,
+      },
       teams: [
         {
           ids: [0, 64],
@@ -140,6 +159,12 @@ function payload(): {
             today: 50,
             last_7_days: 75,
             last_30_days: 66.7,
+          },
+          low_blow_defense_rates: [...lowBlowDefenseRates],
+          low_blow_defense_period_rates: {
+            today: 60,
+            last_7_days: 80,
+            last_30_days: 72.5,
           },
         },
       ],
@@ -171,6 +196,12 @@ describe("parseProfileStatistics", () => {
           last_7_days: 75,
           last_30_days: 66.7,
         },
+        low_blow_defense_rates: expect.arrayContaining([80, null]),
+        low_blow_defense_period_rates: {
+          today: 60,
+          last_7_days: 80,
+          last_30_days: 72.5,
+        },
         teams: [
           {
             ids: [0, 64],
@@ -179,6 +210,12 @@ describe("parseProfileStatistics", () => {
               today: 50,
               last_7_days: 75,
               last_30_days: 66.7,
+            },
+            low_blow_defense_rates: expect.arrayContaining([80, null]),
+            low_blow_defense_period_rates: {
+              today: 60,
+              last_7_days: 80,
+              last_30_days: 72.5,
             },
           },
         ],
@@ -232,6 +269,14 @@ describe("parseProfileStatistics", () => {
       last_7_days: null,
       last_30_days: null,
     };
+    value.trend.low_blow_defense_rates = value.trend.low_blow_defense_rates.map(
+      () => null,
+    );
+    value.trend.low_blow_defense_period_rates = {
+      today: null,
+      last_7_days: null,
+      last_30_days: null,
+    };
     value.trend.teams = [];
     expect(parseProfileStatistics(value)).toMatchObject({
       summary: { games: 0 },
@@ -277,6 +322,52 @@ describe("parseProfileStatistics", () => {
     const invalidPeriodRate = payload();
     invalidPeriodRate.trend.throw_defense_period_rates.last_7_days = 101;
     expect(() => parseProfileStatistics(invalidPeriodRate)).toThrow(/전체 기간별 잡기 풀기 성공률/);
+
+    const wrongLowBlowRateWindow = payload();
+    wrongLowBlowRateWindow.trend.low_blow_defense_rates.pop();
+    expect(() => parseProfileStatistics(wrongLowBlowRateWindow)).toThrow(
+      /전체 하단 가드율 추세/,
+    );
+
+    const invalidLowBlowTeamRate = payload();
+    invalidLowBlowTeamRate.trend.teams[0].low_blow_defense_rates[0] = 101;
+    expect(() => parseProfileStatistics(invalidLowBlowTeamRate)).toThrow(
+      /팀 조합 하단 가드율 추세/,
+    );
+
+    const invalidLowBlowPeriodRate = payload();
+    invalidLowBlowPeriodRate.trend.low_blow_defense_period_rates.last_7_days =
+      101;
+    expect(() => parseProfileStatistics(invalidLowBlowPeriodRate)).toThrow(
+      /전체 기간별 하단 가드율/,
+    );
+  });
+
+  it("uses null low-blow trends when parsing a pre-update RPC response", () => {
+    const legacy = payload();
+    const legacyTrend = legacy.trend as unknown as Record<string, unknown>;
+    delete legacyTrend.low_blow_defense_rates;
+    delete legacyTrend.low_blow_defense_period_rates;
+    const legacyTeam = legacy.trend.teams[0] as unknown as Record<
+      string,
+      unknown
+    >;
+    delete legacyTeam.low_blow_defense_rates;
+    delete legacyTeam.low_blow_defense_period_rates;
+
+    const result = parseProfileStatistics(legacy);
+
+    expect(result.trend.low_blow_defense_rates).toEqual(
+      Array.from({ length: 30 }, () => null),
+    );
+    expect(result.trend.low_blow_defense_period_rates).toEqual({
+      today: null,
+      last_7_days: null,
+      last_30_days: null,
+    });
+    expect(result.trend.teams[0].low_blow_defense_rates).toEqual(
+      Array.from({ length: 30 }, () => null),
+    );
   });
 });
 
