@@ -82,6 +82,21 @@ function ProfileContent({ profile }: { profile: string }) {
     ? profileStatistics?.selectedRival ?? null
     : null;
 
+  // 경기 기록이 한 건도 없으면 존재하지 않는 닉네임으로 보고 안내만 표시합니다.
+  if (profileStatistics && profileStatistics.summary.games === 0) {
+    return (
+      <AppShell title="플레이어 프로필">
+        <article className="rounded-2xl border border-slate-700/80 bg-gradient-to-br from-slate-800/95 to-slate-900/95 p-6 text-center shadow-[0_14px_40px_rgba(0,0,0,0.18)]">
+          <p className="text-base font-semibold text-white">존재하지 않는 플레이어입니다.</p>
+          <p className="mt-2 text-sm text-slate-300/80">
+            <strong className="text-slate-100">{profile}</strong> 님의 전적을 찾을 수 없습니다.
+            닉네임을 다시 확인해 주세요.
+          </p>
+        </article>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell title="플레이어 프로필">
       {previewMapId !== null ? (
@@ -486,10 +501,21 @@ function ProfileContent({ profile }: { profile: string }) {
                   {!statisticsLoading &&
                   selectedOpponent &&
                   hasSelectedStatistics &&
-                  !selectedRival ? (
-                    <p className="py-2 text-sm text-slate-300/80">상대 전적이 없습니다.</p>
+                  profileStatistics?.opponentExists === false ? (
+                    <p className="py-2 text-sm text-slate-300/80">존재하지 않는 플레이어입니다.</p>
                   ) : null}
                   {!statisticsLoading &&
+                  selectedOpponent &&
+                  hasSelectedStatistics &&
+                  profileStatistics?.opponentExists !== false &&
+                  (!selectedRival || selectedRival.games === 0) ? (
+                    <p className="py-2 text-sm text-slate-300/80">
+                      이 플레이어와는 아직 대전한 기록이 없습니다.
+                    </p>
+                  ) : null}
+                  {!statisticsLoading &&
+                    profileStatistics?.opponentExists !== false &&
+                    (!selectedOpponent || selectedRival?.games !== 0) &&
                     (!selectedOpponent || hasSelectedStatistics) &&
                     (selectedRival ? [selectedRival] : selectedOpponent ? [] : rivals).map((rival) => {
                       const row = (

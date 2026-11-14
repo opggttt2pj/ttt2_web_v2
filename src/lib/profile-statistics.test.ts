@@ -23,6 +23,7 @@ function rivalStats() {
 
 function payload(): {
   name: string;
+  opponentExists: boolean | null;
   summary: {
     games: number;
     wins: number;
@@ -114,6 +115,7 @@ function payload(): {
   const lowBlowDefenseRates = dates.map((_, index) => (index === 29 ? 80 : null));
   return {
     name: "Alice",
+    opponentExists: true,
     summary: {
       games: 25,
       wins: 15,
@@ -262,6 +264,7 @@ describe("parseProfileStatistics", () => {
     value.maps = [];
     value.rivals = [];
     value.selectedRival = null;
+    value.opponentExists = null;
     value.trend.daily = value.trend.daily.map(() => [0, 0]);
     value.trend.throw_defense_rates = value.trend.throw_defense_rates.map(() => null);
     value.trend.throw_defense_period_rates = {
@@ -296,6 +299,23 @@ describe("parseProfileStatistics", () => {
     const badRate = payload();
     badRate.rivals[0].stats!.team_throw_success_rate = 120;
     expect(() => parseProfileStatistics(badRate)).toThrow(/최근 상대 전투 스탯 팀 잡기 성공률/);
+  });
+
+  it("parses opponent existence and tolerates a missing flag", () => {
+    expect(parseProfileStatistics(payload()).opponentExists).toBe(true);
+
+    const missingOpponent = payload();
+    missingOpponent.selectedRival = null;
+    delete (missingOpponent as Partial<typeof missingOpponent>).opponentExists;
+    expect(parseProfileStatistics(missingOpponent).opponentExists).toBeNull();
+
+    const absentRival = payload();
+    absentRival.opponentExists = false;
+    expect(parseProfileStatistics(absentRival).opponentExists).toBe(false);
+
+    const invalid = payload();
+    (invalid as { opponentExists: unknown }).opponentExists = "yes";
+    expect(() => parseProfileStatistics(invalid)).toThrow(/상대 존재 여부/);
   });
 
   it("rejects incomplete or inconsistent trend data", () => {

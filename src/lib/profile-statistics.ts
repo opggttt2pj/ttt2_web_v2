@@ -27,6 +27,8 @@ export type LowBlowDefensePeriodRates = {
 
 export type ProfileStatistics = {
   name: string;
+  // 지정한 상대가 실제 플레이어로 존재하는지 여부. 상대 미지정이거나 구버전 응답이면 null.
+  opponentExists: boolean | null;
   summary: {
     games: number;
     wins: number;
@@ -120,6 +122,15 @@ function nullableCount(value: unknown, context: string): number | null {
 function nullablePercentage(value: unknown, context: string): number | null {
   if (value === null || value === undefined) return null;
   return percentage(value, context);
+}
+
+function nullableBoolean(value: unknown, context: string): boolean | null {
+  // 구버전 응답에는 이 키가 없을 수 있으므로 미적용 시 null로 버팁니다.
+  if (value === null || value === undefined) return null;
+  if (typeof value !== "boolean") {
+    throw new Error(`${context} 값이 올바르지 않습니다.`);
+  }
+  return value;
 }
 
 // 상대별 전투 스탯. 그 상대와 스탯이 기록된 경기가 없으면 null입니다.
@@ -370,6 +381,7 @@ export function parseProfileStatistics(value: unknown): ProfileStatistics {
   if (typeof payload.name !== "string" || !payload.name.trim()) {
     throw new Error("프로필 이름 값이 올바르지 않습니다.");
   }
+  const opponentExists = nullableBoolean(payload.opponentExists, "상대 존재 여부");
   const summaryValue = record(payload.summary, "프로필 요약");
   const { games, wins } = parseMatchCounts(summaryValue, "프로필 요약");
   const losses = integer(summaryValue.losses, "프로필 패배 수");
@@ -451,7 +463,7 @@ export function parseProfileStatistics(value: unknown): ProfileStatistics {
 
   const trend = parseProfileTrend(payload.trend);
 
-  return { name: payload.name, summary, teams, maps, rivals, selectedRival, trend };
+  return { name: payload.name, opponentExists, summary, teams, maps, rivals, selectedRival, trend };
 }
 
 export function parsePlayerNameSuggestions(value: unknown): string[] {

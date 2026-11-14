@@ -23,7 +23,7 @@ function displayDate(date: string, period: Period) {
 }
 
 export function ProfilePerformanceTrend({ trend }: { trend: ProfileTrend }) {
-  const [period, setPeriod] = useState<Period>(1);
+  const [period, setPeriod] = useState<Period>(7);
   const [filter, setFilter] = useState("all");
 
   const filters = useMemo(

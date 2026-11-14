@@ -18,16 +18,23 @@ function MetricLine({
   count,
   rate,
   unit,
-}: StatMetric) {
+  showRate,
+}: StatMetric & { showRate: boolean }) {
   return (
-    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_3rem_3.75rem] items-center gap-2 border-b border-[var(--line)]/70 py-1.5 last:border-0">
-      <span className="truncate text-xs text-[var(--muted)]">{label}</span>
+    <div
+      className={`grid min-w-0 items-center gap-2 border-b border-[var(--line)]/70 py-1.5 last:border-0 ${
+        showRate ? "grid-cols-[minmax(0,1fr)_3rem_3.75rem]" : "grid-cols-[minmax(0,1fr)_3rem]"
+      }`}
+    >
+      <span className="text-xs leading-tight text-[var(--muted)]">{label}</span>
       <span className="text-right text-xs font-semibold tabular-nums text-[var(--text)]">
         {countLabel(count, unit)}
       </span>
-      <span className="text-right text-xs font-semibold tabular-nums text-[var(--cyan)]">
-        {rate === undefined ? "" : rateLabel(rate)}
-      </span>
+      {showRate ? (
+        <span className="text-right text-xs font-semibold tabular-nums text-[var(--cyan)]">
+          {rate === undefined ? "" : rateLabel(rate)}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -50,7 +57,13 @@ export function StatMetricGroup({
 
   return (
     <section className="rounded-lg border border-[var(--line)] bg-[rgba(5,13,26,0.38)] px-3 py-2">
-      <div className="mb-1 grid grid-cols-[minmax(0,1fr)_3rem_3.75rem] items-center gap-2">
+      <div
+        className={`mb-1 grid items-center gap-2 ${
+          hasRateColumn
+            ? "grid-cols-[minmax(0,1fr)_3rem_3.75rem]"
+            : "grid-cols-[minmax(0,1fr)_3rem]"
+        }`}
+      >
         <h5 className="text-xs font-bold text-[var(--text)]">{title}</h5>
         <span className="text-right text-[9px] font-medium text-[var(--muted)]">
           {countHeader}
@@ -62,7 +75,7 @@ export function StatMetricGroup({
         ) : null}
       </div>
       {metrics.map((metric) => (
-        <MetricLine key={metric.label} {...metric} />
+        <MetricLine key={metric.label} showRate={hasRateColumn} {...metric} />
       ))}
     </section>
   );
